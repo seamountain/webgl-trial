@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script type="x-shader/x-vertex" id="v-shader">
+      precision mediump float;
+      attribute vec4 vertex;
+      uniform float slow;
+      void main() {
+        gl_Position = vec4(vertex.x, vertex.y - slow, vertex.z, 1.0);
+      }
+    </script>
+    <script type="x-shader/x-fragment" id="f-shader">
+      precision mediump float;
+      uniform vec4 color;
+      void main() {
+        gl_FragColor = color;
+      }
+    </script>
+    <script src="triangle.jsx.js"></script>
+  </head>
+  <body>
+    <canvas id="world" width="400" height="400" style="background-color: gray"/>
+  </body>
+</html>
+

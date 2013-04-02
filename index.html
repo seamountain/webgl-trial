@@ -5,15 +5,28 @@
       precision mediump float;
       attribute vec4 vertex;
       uniform float slow;
+
+      attribute vec2 aVertexPosition;
+      varying vec2 vTexCoord;
       void main() {
         gl_Position = vec4(vertex.x, vertex.y - slow, vertex.z, 1.0);
+        //gl_Position = vec4(vertex.x, vertex.y - slow, vertex.z, 1.0) * vec4(vTexCoord, 1.0, 1.0);
+        vTexCoord = aVertexPosition;
+        //gl_Position = vec4(aVertexPosition, 0, 1);
       }
     </script>
     <script type="x-shader/x-fragment" id="f-shader">
       precision mediump float;
       uniform vec4 color;
+      varying vec2 vTexCoord;
+      uniform sampler2D uSampler;
       void main() {
-        gl_FragColor = color;
+        //gl_FragColor = color;
+        //gl_FragColor = texture2D(uSampler, vTexCoord);
+        gl_FragColor = texture2D(uSampler, vec2(vTexCoord.s, vTexCoord.t));
+
+        //vec4 color = texture2D(uSampler, vTexCoord);
+        //gl_FragColor = vec4(color.xyz, color.a);
       }
     </script>
     <script src="triangle.jsx.js"></script>

@@ -44,6 +44,12 @@ class _Main {
       ++frameNumber;
       gl.clear(gl.COLOR_BUFFER_BIT);
 
+      gl.enable(gl.DEPTH_TEST);
+			//gl.enable(gl.CULL_FACE);
+      gl.enable(gl.BLEND);
+      //gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+      gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE);
+
       var slow = gl.getUniformLocation(prog, 'slow');
       gl.uniform1f(slow, (frameNumber % 100) / 100);
 
@@ -134,7 +140,12 @@ class _Main {
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
       gl.uniform1i(samplerUniform, 0);
       //gl.drawArrays(gl.TRIANGLE_STRIP, 0, 3);
-      
+      //
+
+      var size = 256;
+      //gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, size, size, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+      //gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, size, size, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+      //gl.texImage2D(gl.TEXTURE_2D, 0, gl.DEPTH_COMPONENT, size, size, 0, gl.DEPTH_COMPONENT, gl.UNSIGNED_SHORT, null);
       //gl.uniform1i(samplerUniform, 0);
     });
     //img.src = 'icon.jpg';

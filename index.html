@@ -23,7 +23,9 @@
       void main() {
         //gl_FragColor = color;
         //gl_FragColor = texture2D(uSampler, vTexCoord);
-        gl_FragColor = texture2D(uSampler, vec2(vTexCoord.s, vTexCoord.t));
+        //gl_FragColor = texture2D(uSampler, vec2(vTexCoord.s, vTexCoord.t));
+
+        gl_FragColor = vec4(1, 1, 1, 0.5);
 
         //vec4 color = texture2D(uSampler, vTexCoord);
         //gl_FragColor = vec4(color.xyz, color.a);

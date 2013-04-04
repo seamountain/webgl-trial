@@ -25,54 +25,100 @@ class _Main {
     var prog = gl.createProgram();
     gl.attachShader(prog, vs);
     gl.attachShader(prog, fs);
-    gl.bindAttribLocation(prog, 0, 'vertex');
+    //gl.bindAttribLocation(prog, 0, 'vertex');
     gl.linkProgram(prog);
-
-    var vbuf = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, vbuf);
-
-    gl.vertexAttribPointer(0 /* attrib */, 4, gl.FLOAT, false, 0, 0);
-    gl.enableVertexAttribArray(0);
-
     gl.useProgram(prog);
+
+    var vertex_buf = gl.createBuffer();
+    // bufferをアクティブにする
+    gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buf);
+
+    // データを中に入れる bufferの中に入れる
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
+            1.0,   1.0,  0.0,  1.0,
+            -1.0,   1.0,  0.0,  1.0,
+            1.0,   -1.0,  0.0,  1.0,
+            -1.0,   -1.0,  0.0,  1.0
+
+            //0.3,   0.3,  0.0,  1.0,
+            //0.0,   0.3,  0.0,  1.0,
+            //0.3,   0.0,  0.0,  1.0,
+            //0.0,   0.0,  0.0,  1.0
+
+            //0.7,   0.7,  0.0,  1.0,
+            //0.7,   0.9,  0.0,  1.0,
+            //0.9,   0.7,  0.0,  1.0,
+            //0.9,   0.9,  0.0,  1.0,
+
+            //-0.3,  -0.3,  0.0,  1.0,
+            //-0.3,  -0.5,  0.0,  1.0,
+            //-0.5,  -0.3,  0.0,  1.0,
+            //-0.5,  -0.5,  0.0,  1.0
+            ]), gl.STATIC_DRAW);
+
+    var vertex_loc = gl.getAttribLocation(prog, 'vertex');
+    // ここでつなげる
+    gl.vertexAttribPointer(vertex_loc, 4, gl.FLOAT, false, 0, 0);
+    //データを流せるようにする
+    gl.enableVertexAttribArray(vertex_loc);
+
+    // texture座標用
+    var texture_buf = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, texture_buf);
+    var textureCoordinates  = new Float32Array([
+        1.0, 1.0,
+        0.0, 1.0,
+        1.0, 0.0,
+        0.0, 0.0
+
+        //0.0, 0.0,
+        //1.0, 0.0,
+        //0.0, 1.0,
+        //1.0, 1.0,
+
+        //0.0, 0.0,
+        //1.0, 0.0,
+        //0.0, 1.0,
+        //1.0, 1.0
+        ]);
+
+    //現在bindされているbuffer(現在アクティブなbuffer)
+    gl.bufferData(gl.ARRAY_BUFFER, textureCoordinates, gl.STATIC_DRAW);
+
+    var tex_coord_loc = gl.getAttribLocation(prog, 'vTextureCoord');
+    gl.vertexAttribPointer(tex_coord_loc, 2, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(tex_coord_loc);
 
     var color = gl.getUniformLocation(prog, 'color');
     gl.uniform4fv(color, new Float32Array([1.0, 1.0, 1.0, 0.1]));
 
     var frameNumber = 0;
+    var positions = [
+      [0.0, 0.0],
+      [0.1, 0.3],
+      [0.4, 0.6]
+      ];
     function drawFrame() : void {
       ++frameNumber;
+      for (var i = 0; i < positions.length; i++ ) {
+        positions[i][1] -= 0.01;
+      }
       gl.clear(gl.COLOR_BUFFER_BIT);
 
-      gl.enable(gl.DEPTH_TEST);
+      //gl.enable(gl.DEPTH_TEST);
       //gl.enable(gl.CULL_FACE);
       gl.enable(gl.BLEND);
       //gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
       gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE);
 
-      var slow = gl.getUniformLocation(prog, 'slow');
-      gl.uniform1f(slow, (frameNumber % 100) / 100);
+      var position = gl.getUniformLocation(prog, 'position');
 
-      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
-            0.3,   0.3,  0.0,  1.0,
-            0.0,   0.3,  0.0,  1.0,
-            0.3,   0.0,  0.0,  1.0,
-            0.0,   0.0,  0.0,  1.0,
-
-            0.7,   0.7,  0.0,  1.0,
-            0.7,   0.9,  0.0,  1.0,
-            0.9,   0.7,  0.0,  1.0,
-            0.9,   0.9,  0.0,  1.0,
-
-            -0.3,  -0.3,  0.0,  1.0,
-            -0.3,  -0.5,  0.0,  1.0,
-            -0.5,  -0.3,  0.0,  1.0,
-            -0.5,  -0.5,  0.0,  1.0
-            ]), gl.STATIC_DRAW);
-
-      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-      gl.drawArrays(gl.TRIANGLE_STRIP, 4, 4);
-      gl.drawArrays(gl.TRIANGLE_STRIP, 8, 4);
+      for (var i = 0; i < positions.length; i++) {
+        gl.uniform2f(position, positions[i][0], positions[i][1]);
+        gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+      }
+      //gl.drawArrays(gl.TRIANGLE_STRIP, 4, 4);
+      //gl.drawArrays(gl.TRIANGLE_STRIP, 8, 4);
 
       dom.window.setTimeout(drawFrame, 100);
     }
@@ -86,31 +132,6 @@ class _Main {
 
     gl.vertexAttribPointer(vertexPosAttrib, 4, gl.FLOAT, false, 0, 0);
 
-    var textureCoordinates  = new Float32Array([
-        1.0, 1.0,
-        0.0, 1.0,
-        1.0, 0.0,
-        0.0, 0.0,
-
-        0.0, 0.0,
-        1.0, 0.0,
-        0.0, 1.0,
-        1.0, 1.0,
-
-        0.0, 0.0,
-        1.0, 0.0,
-        0.0, 1.0,
-        1.0, 1.0,
-
-        0.0, 0.0,
-        1.0, 0.0,
-        0.0, 1.0,
-        1.0, 1.0
-        ]);
-    gl.bufferData(gl.ARRAY_BUFFER, textureCoordinates, gl.STATIC_DRAW);
-    gl.vertexAttribPointer(textureCoordAttribute, 2, gl.FLOAT, false, 0, 0);
-    gl.enableVertexAttribArray(textureCoordAttribute);
-
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureCoordinates), gl.STATIC_DRAW);
 
     img.addEventListener("load", (e) -> {
@@ -121,11 +142,11 @@ class _Main {
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      //gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+      //gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
       gl.uniform1i(samplerUniform, 0);
 
-      var size = 256;
+      //var size = 256;
     });
     //img.src = 'icon.jpg';
     img.src = 'icon.gif';

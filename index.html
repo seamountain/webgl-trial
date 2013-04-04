@@ -6,11 +6,11 @@
       attribute vec4 vertex;
       //attribute vec2 aVertexPosition;
       attribute vec2 vTextureCoord;
-      uniform float slow;
+      uniform vec2 position;
       varying vec2 vTexCoord;
 
       void main() {
-        gl_Position = vec4(vertex.x, vertex.y - slow, vertex.z, 1.0);
+        gl_Position = vec4(vertex.x + position.x, vertex.y + position.y, vertex.z, 1.0);
         //gl_Position = vec4(vertex.x, vertex.y - slow, vertex.z, 1.0) * vec4(vTexCoord, 1.0, 1.0);
         vTexCoord = vTextureCoord;
       }
@@ -21,7 +21,7 @@
       varying vec2 vTexCoord;
       uniform sampler2D uSampler;
       void main() {
-        gl_FragColor = texture2D(uSampler, vec2(vTexCoord.s, vTexCoord.t)) * vec4(1, 1, 1, 0.4);
+        gl_FragColor = texture2D(uSampler, vec2(vTexCoord.s, vTexCoord.t)) * vec4(1, 1, 1, 1.0);
       }
     </script>
     <script src="triangle.jsx.js"></script>

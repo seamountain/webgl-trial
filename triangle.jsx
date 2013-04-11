@@ -34,32 +34,32 @@ class _Main {
     gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buf);
 
     // データを中に入れる bufferの中に入れる
-      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
-            0.3,   0.3,  0.0,  1.0,
-            0.0,   0.3,  0.0,  1.0,
-            0.3,   0.0,  0.0,  1.0,
-            0.0,   0.0,  0.0,  1.0
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
+          0.3,   0.3,  0.0,  1.0,
+          0.0,   0.3,  0.0,  1.0,
+          0.3,   0.0,  0.0,  1.0,
+          0.0,   0.0,  0.0,  1.0
 
-            //1.0,   1.0,  0.0,  1.0,
-            //-1.0,   1.0,  0.0,  1.0,
-            //1.0,   -1.0,  0.0,  1.0,
-            //-1.0,   -1.0,  0.0,  1.0
+          //1.0,   1.0,  0.0,  1.0,
+          //-1.0,   1.0,  0.0,  1.0,
+          //1.0,   -1.0,  0.0,  1.0,
+          //-1.0,   -1.0,  0.0,  1.0
 
-            //0.3,   0.3,  0.0,  1.0,
-            //0.0,   0.3,  0.0,  1.0,
-            //0.3,   0.0,  0.0,  1.0,
-            //0.0,   0.0,  0.0,  1.0
+          //0.3,   0.3,  0.0,  1.0,
+          //0.0,   0.3,  0.0,  1.0,
+          //0.3,   0.0,  0.0,  1.0,
+          //0.0,   0.0,  0.0,  1.0
 
-            //0.7,   0.7,  0.0,  1.0,
-            //0.7,   0.9,  0.0,  1.0,
-            //0.9,   0.7,  0.0,  1.0,
-            //0.9,   0.9,  0.0,  1.0,
+          //0.7,   0.7,  0.0,  1.0,
+          //0.7,   0.9,  0.0,  1.0,
+          //0.9,   0.7,  0.0,  1.0,
+          //0.9,   0.9,  0.0,  1.0,
 
-            //-0.3,  -0.3,  0.0,  1.0,
-            //-0.3,  -0.5,  0.0,  1.0,
-            //-0.5,  -0.3,  0.0,  1.0,
-            //-0.5,  -0.5,  0.0,  1.0
-            ]), gl.STATIC_DRAW);
+          //-0.3,  -0.3,  0.0,  1.0,
+          //-0.3,  -0.5,  0.0,  1.0,
+          //-0.5,  -0.3,  0.0,  1.0,
+          //-0.5,  -0.5,  0.0,  1.0
+      ]), gl.STATIC_DRAW);
 
     var vertex_loc = gl.getAttribLocation(prog, 'vertex');
     // ここでつなげる
@@ -98,14 +98,15 @@ class _Main {
     gl.uniform4fv(color, new Float32Array([1.0, 1.0, 1.0, 0.1]));
 
     var frameNumber = 0;
-    var positions = [
+    //var positions = [
+    var origPosition = [
       [0.0, 0.0],
       [0.1, 0.3],
       [0.4, 0.6],
       [-0.5, 0.5],
       [-0.7, 0.8],
       [-0.9, 0.7]
-      ];
+        ];
     var weight = [
       2,
       3,
@@ -113,11 +114,16 @@ class _Main {
       1,
       4,
       5
-      ];
+        ];
     function drawFrame() : void {
       ++frameNumber;
+      var positions = origPosition;
       for (var i = 0; i < positions.length; i++) {
-        positions[i][1] -= 0.01 + weight[i]/100;
+        if (positions[i][1] < -1) {
+          positions[i][1] = origPosition[i][1];
+        } else {
+          positions[i][1] -= 0.01 + weight[i]/100;
+        }
       }
       gl.clear(gl.COLOR_BUFFER_BIT);
 
@@ -136,6 +142,10 @@ class _Main {
       //gl.drawArrays(gl.TRIANGLE_STRIP, 4, 4);
       //gl.drawArrays(gl.TRIANGLE_STRIP, 8, 4);
 
+      //if (!(frameNumber % 10)) {
+      //var random = 1 - Math.floor(Math.random()) * 2;
+      //positions.push([random, 1.0]);
+      //}
       dom.window.setTimeout(drawFrame, 100);
     }
     drawFrame();

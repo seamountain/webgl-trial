@@ -35,10 +35,15 @@ class _Main {
 
     // データを中に入れる bufferの中に入れる
       gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
-            1.0,   1.0,  0.0,  1.0,
-            -1.0,   1.0,  0.0,  1.0,
-            1.0,   -1.0,  0.0,  1.0,
-            -1.0,   -1.0,  0.0,  1.0
+            0.3,   0.3,  0.0,  1.0,
+            0.0,   0.3,  0.0,  1.0,
+            0.3,   0.0,  0.0,  1.0,
+            0.0,   0.0,  0.0,  1.0
+
+            //1.0,   1.0,  0.0,  1.0,
+            //-1.0,   1.0,  0.0,  1.0,
+            //1.0,   -1.0,  0.0,  1.0,
+            //-1.0,   -1.0,  0.0,  1.0
 
             //0.3,   0.3,  0.0,  1.0,
             //0.0,   0.3,  0.0,  1.0,
@@ -96,12 +101,23 @@ class _Main {
     var positions = [
       [0.0, 0.0],
       [0.1, 0.3],
-      [0.4, 0.6]
+      [0.4, 0.6],
+      [-0.5, 0.5],
+      [-0.7, 0.8],
+      [-0.9, 0.7]
+      ];
+    var weight = [
+      2,
+      3,
+      0,
+      1,
+      4,
+      5
       ];
     function drawFrame() : void {
       ++frameNumber;
-      for (var i = 0; i < positions.length; i++ ) {
-        positions[i][1] -= 0.01;
+      for (var i = 0; i < positions.length; i++) {
+        positions[i][1] -= 0.01 + weight[i]/100;
       }
       gl.clear(gl.COLOR_BUFFER_BIT);
 

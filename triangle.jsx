@@ -36,9 +36,9 @@ class _Main {
 
     // データを中に入れる bufferの中に入れる
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
-          0.3,   0.3,  0.0,  1.0,
-          0.0,   0.3,  0.0,  1.0,
-          0.3,   0.0,  0.0,  1.0,
+          1.0,   1.0,  0.0,  1.0,
+          0.0,   1.0,  0.0,  1.0,
+          1.0,   0.0,  0.0,  1.0,
           0.0,   0.0,  0.0,  1.0
           ]), gl.STATIC_DRAW);
 
@@ -68,22 +68,21 @@ class _Main {
     var color = gl.getUniformLocation(prog, 'color');
     gl.uniform4fv(color, new Float32Array([1.0, 1.0, 1.0, 0.1]));
 
-    //var frameNumber = 0;
-    var origPosition = [
-      [0.0, 0.0],
-      [0.1, 0.3],
-      [0.4, 0.6],
-      [-0.5, 0.5],
-      [-0.7, 0.8],
-      [-0.9, 0.7]
-        ];
-    var weight = [2, 3, 0, 1, 4, 5];
-
-    var position = gl.getUniformLocation(prog, 'position');
-    var positions = origPosition;
+    var scale = 0.1;
+    var scale_loc = gl.getUniformLocation(prog, 'scale');
+    gl.uniform3fv(scale_loc, new Float32Array([scale, scale, scale]));
 
     var UPDATE_FPS = 25;
-
+    var weight = [2, 3, 0, 1, 4, 5];
+    var origPosition = [
+      [0.0, 0.0, 0.5],
+      [0.1, 0.3, 1.0],
+      [0.4, 0.6, 0.5],
+      [-0.5, 0.5, 0.0],
+      [-0.7, 0.8, 0.8],
+      [-0.9, 0.7, 0.0]
+        ];
+    var positions = origPosition;
     function update() : void {
       Timer.setTimeout(update, 1000 / UPDATE_FPS);
       for (var i = 0; i < positions.length; i++) {
@@ -95,15 +94,15 @@ class _Main {
       }
     }
 
+    var position = gl.getUniformLocation(prog, 'position');
     function render(f:number) : void {
       Timer.requestAnimationFrame(render);
-      //++frameNumber;
       gl.clear(gl.COLOR_BUFFER_BIT);
       gl.enable(gl.BLEND);
       gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE);
 
       for (var i = 0; i < positions.length; i++) {
-        gl.uniform2f(position, positions[i][0], positions[i][1]);
+        gl.uniform3f(position, positions[i][0] / scale, positions[i][1] / scale, positions[i][2] / scale);
         gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
       }
     }

@@ -1,4 +1,5 @@
 import "js/web.jsx";
+import "Timer.jsx";
 
 class _Main {
   static function main(args : string[]) : void {
@@ -39,27 +40,7 @@ class _Main {
           0.0,   0.3,  0.0,  1.0,
           0.3,   0.0,  0.0,  1.0,
           0.0,   0.0,  0.0,  1.0
-
-          //1.0,   1.0,  0.0,  1.0,
-          //-1.0,   1.0,  0.0,  1.0,
-          //1.0,   -1.0,  0.0,  1.0,
-          //-1.0,   -1.0,  0.0,  1.0
-
-          //0.3,   0.3,  0.0,  1.0,
-          //0.0,   0.3,  0.0,  1.0,
-          //0.3,   0.0,  0.0,  1.0,
-          //0.0,   0.0,  0.0,  1.0
-
-          //0.7,   0.7,  0.0,  1.0,
-          //0.7,   0.9,  0.0,  1.0,
-          //0.9,   0.7,  0.0,  1.0,
-          //0.9,   0.9,  0.0,  1.0,
-
-          //-0.3,  -0.3,  0.0,  1.0,
-          //-0.3,  -0.5,  0.0,  1.0,
-          //-0.5,  -0.3,  0.0,  1.0,
-          //-0.5,  -0.5,  0.0,  1.0
-      ]), gl.STATIC_DRAW);
+          ]), gl.STATIC_DRAW);
 
     var vertex_loc = gl.getAttribLocation(prog, 'vertex');
     // ここでつなげる
@@ -75,16 +56,6 @@ class _Main {
         0.0, 1.0,
         1.0, 0.0,
         0.0, 0.0
-
-        //0.0, 0.0,
-        //1.0, 0.0,
-        //0.0, 1.0,
-        //1.0, 1.0,
-
-        //0.0, 0.0,
-        //1.0, 0.0,
-        //0.0, 1.0,
-        //1.0, 1.0
         ]);
 
     //現在bindされているbuffer(現在アクティブなbuffer)
@@ -97,8 +68,7 @@ class _Main {
     var color = gl.getUniformLocation(prog, 'color');
     gl.uniform4fv(color, new Float32Array([1.0, 1.0, 1.0, 0.1]));
 
-    var frameNumber = 0;
-    //var positions = [
+    //var frameNumber = 0;
     var origPosition = [
       [0.0, 0.0],
       [0.1, 0.3],
@@ -107,17 +77,15 @@ class _Main {
       [-0.7, 0.8],
       [-0.9, 0.7]
         ];
-    var weight = [
-      2,
-      3,
-      0,
-      1,
-      4,
-      5
-        ];
-    function drawFrame() : void {
-      ++frameNumber;
-      var positions = origPosition;
+    var weight = [2, 3, 0, 1, 4, 5];
+
+    var position = gl.getUniformLocation(prog, 'position');
+    var positions = origPosition;
+
+    var UPDATE_FPS = 25;
+
+    function update() : void {
+      Timer.setTimeout(update, 1000 / UPDATE_FPS);
       for (var i = 0; i < positions.length; i++) {
         if (positions[i][1] < -1) {
           positions[i][1] = origPosition[i][1];
@@ -125,30 +93,26 @@ class _Main {
           positions[i][1] -= 0.01 + weight[i]/100;
         }
       }
+    }
+
+    function render(f:number) : void {
+      Timer.requestAnimationFrame(render);
+      //++frameNumber;
       gl.clear(gl.COLOR_BUFFER_BIT);
-
-      //gl.enable(gl.DEPTH_TEST);
-      //gl.enable(gl.CULL_FACE);
       gl.enable(gl.BLEND);
-      //gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
       gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE);
-
-      var position = gl.getUniformLocation(prog, 'position');
 
       for (var i = 0; i < positions.length; i++) {
         gl.uniform2f(position, positions[i][0], positions[i][1]);
         gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
       }
-      //gl.drawArrays(gl.TRIANGLE_STRIP, 4, 4);
-      //gl.drawArrays(gl.TRIANGLE_STRIP, 8, 4);
-
-      //if (!(frameNumber % 10)) {
-      //var random = 1 - Math.floor(Math.random()) * 2;
-      //positions.push([random, 1.0]);
-      //}
-      dom.window.setTimeout(drawFrame, 100);
     }
-    drawFrame();
+    var raf = (dom.window.location.hash == "#raf");
+    log "use native RAF: " + raf as string;
+    Timer.useNativeRAF(raf);
+
+    update();
+    render(0);
 
     var samplerUniform = gl.getUniformLocation(prog, 'uSampler');
     var vertexPosAttrib = gl.getAttribLocation(prog, 'aVertexPosition');
@@ -163,18 +127,12 @@ class _Main {
     img.addEventListener("load", (e) -> {
       gl.activeTexture(gl.TEXTURE0);
       gl.bindTexture(gl.TEXTURE_2D, texture);
-      //gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
       gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1); // 画像の上下反転
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-      //gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-      //gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
       gl.uniform1i(samplerUniform, 0);
-
-      //var size = 256;
     });
-    //img.src = 'icon.jpg';
     img.src = 'icon.gif';
   }
 }

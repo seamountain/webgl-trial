@@ -11,7 +11,6 @@
       void main() {
         gl_Position = vec4(vertex.x + position.x, vertex.y + position.y, vertex.z, 1.0);
         vTexCoord = vTextureCoord;
-        //gl_Position = vec4(vertex.x, vertex.y - slow, vertex.z, 1.0) * vec4(vTexCoord, 1.0, 1.0);
       }
     </script>
     <script type="x-shader/x-fragment" id="f-shader">

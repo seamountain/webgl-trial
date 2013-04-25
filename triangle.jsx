@@ -1,5 +1,6 @@
 import "js/web.jsx";
 import "Timer.jsx";
+import "mvq.jsx/lib/mvq.jsx";
 
 class _Main {
   static function main(args : string[]) : void {
@@ -30,21 +31,25 @@ class _Main {
     gl.linkProgram(prog);
     gl.useProgram(prog);
 
+    var projectionMatrix = M44.frustum(-1, 1, -1, 1, 3, 1000);
+    var projectionMatrix_location = gl.getUniformLocation(prog, 'projectionMatrix');
+    gl.uniformMatrix4fv(projectionMatrix_location, false, projectionMatrix.array());
+
     var vertex_buf = gl.createBuffer();
     // bufferをアクティブにする
     gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buf);
 
     // データを中に入れる bufferの中に入れる
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
-          1.0,   1.0,  0.0,  1.0,
-          0.0,   1.0,  0.0,  1.0,
-          1.0,   0.0,  0.0,  1.0,
-          0.0,   0.0,  0.0,  1.0
+          1.0,   1.0,  0.0,
+          0.0,   1.0,  0.0,
+          1.0,   0.0,  0.0,
+          0.0,   0.0,  0.0
           ]), gl.STATIC_DRAW);
 
     var vertex_loc = gl.getAttribLocation(prog, 'vertex');
     // ここでつなげる
-    gl.vertexAttribPointer(vertex_loc, 4, gl.FLOAT, false, 0, 0);
+    gl.vertexAttribPointer(vertex_loc, 3, gl.FLOAT, false, 0, 0);
     //データを流せるようにする
     gl.enableVertexAttribArray(vertex_loc);
 
@@ -68,7 +73,7 @@ class _Main {
     var color = gl.getUniformLocation(prog, 'color');
     gl.uniform4fv(color, new Float32Array([1.0, 1.0, 1.0, 0.1]));
 
-    var scale = 0.1;
+    var scale = 0.4;
     var scale_loc = gl.getUniformLocation(prog, 'scale');
     gl.uniform3fv(scale_loc, new Float32Array([scale, scale, scale]));
 
@@ -88,7 +93,7 @@ class _Main {
     for (var i = 0; i < 100; i++) {
       weight.push(1.0 - Math.random() * 2);
       origPosition.push(
-          [1 - Math.random() * 2, 3 - Math.random() * 2, 1 - Math.random() * 2]
+          [1 - Math.random() * 2, 3 - Math.random() * 2, -4 - Math.random() * 5]
           );
     }
 

@@ -73,15 +73,25 @@ class _Main {
     gl.uniform3fv(scale_loc, new Float32Array([scale, scale, scale]));
 
     var UPDATE_FPS = 25;
-    var weight = [2, 3, 0, 1, 4, 5];
-    var origPosition = [
-      [0.0, 0.0, 0.5],
-      [0.1, 0.3, 1.0],
-      [0.4, 0.6, 0.5],
-      [-0.5, 0.5, 0.0],
-      [-0.7, 0.8, 0.8],
-      [-0.9, 0.7, 0.0]
-        ];
+    //var weight = [1.0, 0.3, 0.0, 0.8, 0.4, 0.5];
+    //var origPosition = [
+      //[ 0.0, 0.8, -0.5],
+      //[ 0.1, 1.0, -1.0],
+      //[ 0.4, 1.0, 0.5],
+      //[-0.5, 1.0, 0.0],
+      //[-0.7, 1.0, 0.8],
+      //[-0.9, 1.3, 0.0]
+        //];
+
+    var weight = [0.1, 0.2];
+    var origPosition = [[0.5, 0.5, 0.5]];
+    for (var i = 0; i < 100; i++) {
+      weight.push(1.0 - Math.random() * 2);
+      origPosition.push(
+          [1 - Math.random() * 2, 3 - Math.random() * 2, 1 - Math.random() * 2]
+          );
+    }
+
     var positions = origPosition;
     function update() : void {
       Timer.setTimeout(update, 1000 / UPDATE_FPS);

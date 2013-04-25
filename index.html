@@ -8,19 +8,25 @@
       uniform vec3 position;
       uniform vec3 scale;
       varying vec2 vTexCoord;
+      varying vec3 vPosition;
       void main() {
         //gl_Position = vec4(vertex.x + position.x, vertex.y + position.y, vertex.z, 1.0);
         gl_Position = vec4(vertex.x + position.x, vertex.y + position.y, vertex.z + position.z, 1.0) * vec4(scale, 1.0);
         vTexCoord = vTextureCoord;
+        vPosition = position;
       }
     </script>
     <script type="x-shader/x-fragment" id="f-shader">
       precision mediump float;
       uniform vec4 color;
       varying vec2 vTexCoord;
+      varying vec3 vPosition;
       uniform sampler2D uSampler;
+      float gray_color;
       void main() {
-        gl_FragColor = texture2D(uSampler, vec2(vTexCoord.s, vTexCoord.t)) * vec4(1, 1, 1, 0.5);
+        //gl_FragColor = texture2D(uSampler, vec2(vTexCoord.s, vTexCoord.t)) * vec4(1, 1, 1, 0.5);
+        gray_color = 1.0 - vPosition.z / 30.0;
+        gl_FragColor = texture2D(uSampler, vec2(vTexCoord.s, vTexCoord.t)) * vec4(gray_color, gray_color, gray_color, 0.7);
       }
     </script>
     <script src="triangle.jsx.js"></script>

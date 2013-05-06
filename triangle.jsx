@@ -31,7 +31,8 @@ class _Main {
     gl.linkProgram(prog);
     gl.useProgram(prog);
 
-    var projectionMatrix = M44.frustum(-1, 1, -1, 1, 3, 1000);
+    //var projectionMatrix = M44.frustum(-1, 1, -1, 1, 7, 1000);
+    var projectionMatrix = M44.frustum(-0.8, 0.8, -0.8, 0.8, 7, 1000);
     var projectionMatrix_location = gl.getUniformLocation(prog, 'projectionMatrix');
     gl.uniformMatrix4fv(projectionMatrix_location, false, projectionMatrix.array());
 
@@ -70,10 +71,22 @@ class _Main {
     gl.vertexAttribPointer(tex_coord_loc, 2, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(tex_coord_loc);
 
+    //texture座標用
+    //var back_texture_buf = gl.createBuffer();
+    //gl.bindBuffer(gl.ARRAY_BUFFER, back_texture_buf);
+    //var textureCoordinates  = new Float32Array([
+
+        //]);
+    //現在bindされているbuffer(現在アクティブなbuffer)
+    //gl.bufferData(gl.ARRAY_BUFFER, textureCoordinates, gl.STATIC_DRAW);
+    //var back_corrd_loc = gl.getAttribLocation(prog, 'backTextureCoord');
+    //gl.vertexAttribPointer(back_corrd_loc, 1, gl.Float, false, 0, 0);
+    //gl.enableVertexAttribArray(back_corrd_loc);
+
     var color = gl.getUniformLocation(prog, 'color');
     gl.uniform4fv(color, new Float32Array([1.0, 1.0, 1.0, 0.1]));
 
-    var scale = 0.4;
+    var scale = 0.2;
     var scale_loc = gl.getUniformLocation(prog, 'scale');
     gl.uniform3fv(scale_loc, new Float32Array([scale, scale, scale]));
 
@@ -90,7 +103,7 @@ class _Main {
 
     var weight = [0.1, 0.2];
     var origPosition = [[0.5, 0.5, 0.5]];
-    for (var i = 0; i < 100; i++) {
+    for (var i = 0; i < 1000; i++) {
       weight.push(1.0 - Math.random() * 2);
       origPosition.push(
           [1 - Math.random() * 2, 3 - Math.random() * 2, -4 - Math.random() * 5]
@@ -110,6 +123,7 @@ class _Main {
     }
 
     var position = gl.getUniformLocation(prog, 'position');
+    var uBackImagePosition = gl.getUniformLocation(prog, 'backImagePosition');
     function render(f:number) : void {
       Timer.requestAnimationFrame(render);
       gl.clear(gl.COLOR_BUFFER_BIT);
@@ -120,6 +134,9 @@ class _Main {
         gl.uniform3f(position, positions[i][0] / scale, positions[i][1] / scale, positions[i][2] / scale);
         gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
       }
+
+      gl.uniform3f(uBackImagePosition, 0.0, 0.0, 0.0);
+      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
     }
     var raf = (dom.window.location.hash == "#raf");
     log "use native RAF: " + raf as string;
@@ -128,11 +145,18 @@ class _Main {
     update();
     render(0);
 
-    var samplerUniform = gl.getUniformLocation(prog, 'uSampler');
+    var snowTexUniform = gl.getUniformLocation(prog, 'snowTex');
+    var iconTexUniform = gl.getUniformLocation(prog, 'iconTex');
+    var videoTexUniform = gl.getUniformLocation(prog, 'videoTex');
     var vertexPosAttrib = gl.getAttribLocation(prog, 'aVertexPosition');
-    var textureCoordAttribute = gl.getAttribLocation(prog, 'vTextureCoord');
+    //var textureCoordAttribute = gl.getAttribLocation(prog, 'vTextureCoord');
     var texture = gl.createTexture();
     var img = dom.createElement("img") as HTMLImageElement;
+    img.src = 'icon.gif';
+    //var videoElement = dom.id("video") as HTMLVideoElement;
+    //var videoElement = dom.createElement("video") as HTMLVideoElement;
+    var img2 = dom.createElement("img") as HTMLImageElement;
+    img2.src = 'icon.jpg';
 
     gl.vertexAttribPointer(vertexPosAttrib, 4, gl.FLOAT, false, 0, 0);
 
@@ -145,8 +169,36 @@ class _Main {
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-      gl.uniform1i(samplerUniform, 0);
+      gl.uniform1i(snowTexUniform, 0);
+
+      //gl.activeTexture(gl.TEXTURE1);
+      //gl.bindTexture(gl.TEXTURE_2D, texture);
+      //gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1); // 画像の上下反転
+      //gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, videoElement);
+      //gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+      //gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+      //gl.uniform1i(videoTexUniform, 0);
     });
-    img.src = 'icon.gif';
+
+    var texture2 = gl.createTexture();
+    img2.addEventListener("load", (e) -> {
+      gl.activeTexture(gl.TEXTURE1);
+      gl.bindTexture(gl.TEXTURE_2D, texture2);
+      gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1); // 画像の上下反転
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img2);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+      gl.uniform1i(iconTexUniform, 1);
+    });
+    //var texture2 = gl.createTexture();
+    //videoElement.addEventListener("load", (e) -> {
+      //gl.activeTexture(gl.TEXTURE1);
+      //gl.bindTexture(gl.TEXTURE_2D, texture2);
+      //gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1); // 画像の上下反転
+      //gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, videoElement);
+      //gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+      //gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+      //gl.uniform1i(videoTexUniform, 1);
+    //});
   }
 }

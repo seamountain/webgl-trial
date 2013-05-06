@@ -8,13 +8,18 @@
       uniform vec3 position;
       uniform vec3 scale;
       uniform mat4 projectionMatrix;
+      uniform vec3 backImagePosition;
+
       varying vec2 vTexCoord;
       varying vec3 vPosition;
+      varying vec3 vBackPosition;
       void main() {
         //gl_Position = vec4(vertex.x + position.x, vertex.y + position.y, vertex.z, 1.0);
         gl_Position = projectionMatrix * vec4(vertex * scale + position, 1.0);
         vTexCoord = vTextureCoord;
         vPosition = position;
+        //vBackPosition = vTextureCoord;
+        vBackPosition = backImagePosition;
       }
     </script>
     <script type="x-shader/x-fragment" id="f-shader">
@@ -22,18 +27,38 @@
       uniform vec4 color;
       varying vec2 vTexCoord;
       varying vec3 vPosition;
-      uniform sampler2D uSampler;
+      varying vec3 vBackPosition;
+      uniform sampler2D snowTex;
+      uniform sampler2D iconTex;
+      uniform sampler2D videoTex;
       float gray_color;
       void main() {
-        //gl_FragColor = texture2D(uSampler, vec2(vTexCoord.s, vTexCoord.t)) * vec4(1, 1, 1, 0.5);
-        gray_color = 1.0 - vPosition.z / 30.0;
-        gl_FragColor = texture2D(uSampler, vec2(vTexCoord.s, vTexCoord.t)) * vec4(gray_color, gray_color, gray_color, 0.7);
+        //gl_FragColor = texture2D(snowTex, vec2(vTexCoord.s, vTexCoord.t)) * vec4(1, 1, 1, 0.5);
+        //gray_color = 1.0 - vPosition.z;
+        //gl_FragColor = vec4(gray_color, gray_color, gray_color, 0.7);
+        //gl_FragColor = texture2D(snowTex, vec2(vTexCoord.s, vTexCoord.t)) * vec4(gray_color, gray_color, gray_color, 0.7);
+        //gl_FragColor = texture2D(snowTex, vec2(vBackPosition.s, vBackPosition.t)) * texture2D(videoTex, vec2(vTexCoord.s, vTexCoord.t)) * vec4(1.0, 1.0, 1.0, 1.0);
+        //gl_FragColor = texture2D(iconTex, vec2(vBackPosition.s, vBackPosition.t)) * texture2D(snowTex, vec2(vTexCoord.s, vTexCoord.t)) *vec4(1.0, 1.0, 1.0, 1.0);
+        //gl_FragColor = texture2D(iconTex, vec2(vBackPosition.s, vBackPosition.t)) * vec4(1.0, 1.0, 1.0, 1.0);
+        gl_FragColor = texture2D(snowTex, vec2(vTexCoord.s, vTexCoord.t)) * vec4(1.0, 1.0, 1.0, 0.4);
+        //gl_FragColor = texture2D(iconTex, vec2(vTexCoord.s, vTexCoord.t)) * vec4(1.0, 1.0, 1.0, 0.3);
+        //gl_FragColor = texture2D(videoTex, vec2(vTexCoord.s, vTexCoord.t)) * vec4(0.8, 0.8, 0.8, 0.7);
       }
     </script>
     <script src="triangle.jsx.js"></script>
   </head>
-  <body>
+ nya-ahogehoge
+  <body style="background-color: gray">
+    <!--<input type="file" accept="image/*;capture=camera">-->
+    <!--<video id="hogl" width="200" height="200" autoplay=true></video>-->
+    <!--<canvas id="canvas" width="640" height="480"></canvas>-->
+    <!--<device type="media" onchange="update(this.data)"></device>-->
+    <!--<device type=media onchange="update(this.data)"></device>-->
+    <div>
+    </div>
+    <img src="./icon.jpg" alt="" id="img"/>
     <canvas id="world" width="400" height="400" style="background-color: gray"/>
+    <script src="video.js"></script>
   </body>
 </html>
 

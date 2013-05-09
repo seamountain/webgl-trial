@@ -31,6 +31,9 @@ class _Main {
     gl.linkProgram(prog);
     gl.useProgram(prog);
 
+    var snowTexUniform = gl.getUniformLocation(prog, 'snowTex');
+    gl.uniform1i(snowTexUniform, 0);
+
     //var projectionMatrix = M44.frustum(-1, 1, -1, 1, 7, 1000);
     var projectionMatrix = M44.frustum(-0.8, 0.8, -0.8, 0.8, 7, 1000);
     var projectionMatrix_location = gl.getUniformLocation(prog, 'projectionMatrix');
@@ -86,8 +89,12 @@ class _Main {
     var color = gl.getUniformLocation(prog, 'color');
     gl.uniform4fv(color, new Float32Array([1.0, 1.0, 1.0, 0.1]));
 
-    var scale = 0.2;
+    var scale = 1.0;
     var scale_loc = gl.getUniformLocation(prog, 'scale');
+
+    var uBackImagePosition = gl.getUniformLocation(prog, 'backImagePosition');
+    gl.uniform3f(uBackImagePosition, 0.5, 0.5, 0.5);
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
     gl.uniform3fv(scale_loc, new Float32Array([scale, scale, scale]));
 
     var UPDATE_FPS = 25;
@@ -110,6 +117,32 @@ class _Main {
           );
     }
 
+    var texture = gl.createTexture();
+    var img = dom.createElement("img") as HTMLImageElement;
+    img.addEventListener("load", (e) -> {
+      gl.activeTexture(gl.TEXTURE0);
+      gl.bindTexture(gl.TEXTURE_2D, texture);
+      gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1); // 画像の上下反転
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    });
+    img.src = 'icon.gif';
+
+    var texture2 = gl.createTexture();
+    var img2 = dom.createElement("img") as HTMLImageElement;
+    img2.addEventListener("load", (e) -> {
+      gl.activeTexture(gl.TEXTURE0);
+      gl.bindTexture(gl.TEXTURE_2D, texture2);
+      gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1); // 画像の上下反転
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img2);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    });
+    img2.src = 'icon.jpg';
+
+    scale = 0.2;
+    gl.uniform3fv(scale_loc, new Float32Array([scale, scale, scale]));
     var positions = origPosition;
     function update() : void {
       Timer.setTimeout(update, 1000 / UPDATE_FPS);
@@ -123,20 +156,24 @@ class _Main {
     }
 
     var position = gl.getUniformLocation(prog, 'position');
-    var uBackImagePosition = gl.getUniformLocation(prog, 'backImagePosition');
     function render(f:number) : void {
       Timer.requestAnimationFrame(render);
       gl.clear(gl.COLOR_BUFFER_BIT);
       gl.enable(gl.BLEND);
+      //gl.enable(gl.DEPTH_TEST);
       gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE);
 
+      gl.bindTexture(gl.TEXTURE_2D, texture2);
+      gl.uniform3f(position, -20, -20, -900);
+      gl.uniform3fv(scale_loc, new Float32Array([100, 100, 100]));
+      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+
+      gl.uniform3fv(scale_loc, new Float32Array([scale, scale, scale]));
+      gl.bindTexture(gl.TEXTURE_2D, texture);
       for (var i = 0; i < positions.length; i++) {
         gl.uniform3f(position, positions[i][0] / scale, positions[i][1] / scale, positions[i][2] / scale);
         gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
       }
-
-      gl.uniform3f(uBackImagePosition, 0.0, 0.0, 0.0);
-      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
     }
     var raf = (dom.window.location.hash == "#raf");
     log "use native RAF: " + raf as string;
@@ -145,60 +182,14 @@ class _Main {
     update();
     render(0);
 
-    var snowTexUniform = gl.getUniformLocation(prog, 'snowTex');
-    var iconTexUniform = gl.getUniformLocation(prog, 'iconTex');
     var videoTexUniform = gl.getUniformLocation(prog, 'videoTex');
     var vertexPosAttrib = gl.getAttribLocation(prog, 'aVertexPosition');
     //var textureCoordAttribute = gl.getAttribLocation(prog, 'vTextureCoord');
-    var texture = gl.createTexture();
-    var img = dom.createElement("img") as HTMLImageElement;
-    img.src = 'icon.gif';
     //var videoElement = dom.id("video") as HTMLVideoElement;
     //var videoElement = dom.createElement("video") as HTMLVideoElement;
-    var img2 = dom.createElement("img") as HTMLImageElement;
-    img2.src = 'icon.jpg';
 
     gl.vertexAttribPointer(vertexPosAttrib, 4, gl.FLOAT, false, 0, 0);
 
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureCoordinates), gl.STATIC_DRAW);
-
-    img.addEventListener("load", (e) -> {
-      gl.activeTexture(gl.TEXTURE0);
-      gl.bindTexture(gl.TEXTURE_2D, texture);
-      gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1); // 画像の上下反転
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-      gl.uniform1i(snowTexUniform, 0);
-
-      //gl.activeTexture(gl.TEXTURE1);
-      //gl.bindTexture(gl.TEXTURE_2D, texture);
-      //gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1); // 画像の上下反転
-      //gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, videoElement);
-      //gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-      //gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-      //gl.uniform1i(videoTexUniform, 0);
-    });
-
-    var texture2 = gl.createTexture();
-    img2.addEventListener("load", (e) -> {
-      gl.activeTexture(gl.TEXTURE1);
-      gl.bindTexture(gl.TEXTURE_2D, texture2);
-      gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1); // 画像の上下反転
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img2);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-      gl.uniform1i(iconTexUniform, 1);
-    });
-    //var texture2 = gl.createTexture();
-    //videoElement.addEventListener("load", (e) -> {
-      //gl.activeTexture(gl.TEXTURE1);
-      //gl.bindTexture(gl.TEXTURE_2D, texture2);
-      //gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1); // 画像の上下反転
-      //gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, videoElement);
-      //gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-      //gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-      //gl.uniform1i(videoTexUniform, 1);
-    //});
   }
 }

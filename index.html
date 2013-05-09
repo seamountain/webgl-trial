@@ -29,20 +29,19 @@
       varying vec3 vPosition;
       varying vec3 vBackPosition;
       uniform sampler2D snowTex;
-      uniform sampler2D iconTex;
-      uniform sampler2D videoTex;
       float gray_color;
       void main() {
-        //gl_FragColor = texture2D(snowTex, vec2(vTexCoord.s, vTexCoord.t)) * vec4(1, 1, 1, 0.5);
-        //gray_color = 1.0 - vPosition.z;
-        //gl_FragColor = vec4(gray_color, gray_color, gray_color, 0.7);
-        //gl_FragColor = texture2D(snowTex, vec2(vTexCoord.s, vTexCoord.t)) * vec4(gray_color, gray_color, gray_color, 0.7);
-        //gl_FragColor = texture2D(snowTex, vec2(vBackPosition.s, vBackPosition.t)) * texture2D(videoTex, vec2(vTexCoord.s, vTexCoord.t)) * vec4(1.0, 1.0, 1.0, 1.0);
-        //gl_FragColor = texture2D(iconTex, vec2(vBackPosition.s, vBackPosition.t)) * texture2D(snowTex, vec2(vTexCoord.s, vTexCoord.t)) *vec4(1.0, 1.0, 1.0, 1.0);
-        //gl_FragColor = texture2D(iconTex, vec2(vBackPosition.s, vBackPosition.t)) * vec4(1.0, 1.0, 1.0, 1.0);
-        gl_FragColor = texture2D(snowTex, vec2(vTexCoord.s, vTexCoord.t)) * vec4(1.0, 1.0, 1.0, 0.4);
-        //gl_FragColor = texture2D(iconTex, vec2(vTexCoord.s, vTexCoord.t)) * vec4(1.0, 1.0, 1.0, 0.3);
-        //gl_FragColor = texture2D(videoTex, vec2(vTexCoord.s, vTexCoord.t)) * vec4(0.8, 0.8, 0.8, 0.7);
+        vec4 snow2D = texture2D(snowTex, vec2(vTexCoord.s, vTexCoord.t));
+        //vec3 depth = vec3(1.0, 1.0, 1.0) + vPosition.z / 150.0;
+        gl_FragColor = snow2D * vec4(1.0, 1.0, 1.0, 0.6);
+      }
+    </script>
+    <script type="x-shader/x-fragment" id="f-shader-for-back">
+      varying vec2 vTexCoord;
+      uniform sampler2D iconTex;
+      void main() {
+        vec4 icon2D = texture2D(iconTex, vec2(vTexCoord.s, vTexCoord.t));
+        gl_FragColor = icon2D * vec4(1.0, 1.0, 1.0, 1.0);
       }
     </script>
     <script src="triangle.jsx.js"></script>

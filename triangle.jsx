@@ -141,6 +141,18 @@ class _Main {
     });
     img2.src = 'icon.jpg';
 
+    var video = dom.id('v') as HTMLVideoElement;
+    dom.window.navigator.webkitGetUserMedia(
+        {video:true}:Map.<variant>,
+        function(lms:LocalMediaStream):void {
+          video.src = URL.createObjectURL(lms);
+        }
+    );
+    var cameraTex = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, cameraTex);
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
+
     scale = 0.2;
     gl.uniform3fv(scale_loc, new Float32Array([scale, scale, scale]));
     var positions = origPosition;
@@ -168,6 +180,23 @@ class _Main {
       gl.uniform3fv(scale_loc, new Float32Array([100, 100, 100]));
       gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 
+
+      gl.bindTexture(gl.TEXTURE_2D, cameraTex);
+      //if (video.videoWidth >= 16 && video.videoHeight >= 16) {
+        function pot_ge(n:number):number{var r=1; while(r<n)r*=2; return r;}
+        var texSizeX = pot_ge(video.videoWidth);
+        var texSizeY = pot_ge(video.videoHeight);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, texSizeX, texSizeY, 0, gl.RGB, gl.UNSIGNED_BYTE, null);
+        gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, gl.RGB, gl.UNSIGNED_BYTE, video);
+        gl.generateMipmap(gl.TEXTURE_2D);
+        var texCoordScaleX = video.videoWidth / texSizeX;
+        var texCoordScaleY = video.videoHeight / texSizeY;
+        //gl.uniform2f(gl.getUniformLocation(prog, 'texCoordScale'), texCoordScaleX, texCoordScaleY);
+      //}
+      gl.uniform3f(position, -40, -40, -500);
+      gl.uniform3fv(scale_loc, new Float32Array([100, 100, 100]));
+      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+
       gl.uniform3fv(scale_loc, new Float32Array([scale, scale, scale]));
       gl.bindTexture(gl.TEXTURE_2D, texture);
       for (var i = 0; i < positions.length; i++) {
@@ -182,7 +211,7 @@ class _Main {
     update();
     render(0);
 
-    var videoTexUniform = gl.getUniformLocation(prog, 'videoTex');
+    //var videoTexUniform = gl.getUniformLocation(prog, 'videoTex');
     var vertexPosAttrib = gl.getAttribLocation(prog, 'aVertexPosition');
     //var textureCoordAttribute = gl.getAttribLocation(prog, 'vTextureCoord');
     //var videoElement = dom.id("video") as HTMLVideoElement;

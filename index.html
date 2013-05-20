@@ -36,28 +36,13 @@
         gl_FragColor = snow2D * vec4(1.0, 1.0, 1.0, 0.6);
       }
     </script>
-    <script type="x-shader/x-fragment" id="f-shader-for-back">
-      varying vec2 vTexCoord;
-      uniform sampler2D iconTex;
-      void main() {
-        vec4 icon2D = texture2D(iconTex, vec2(vTexCoord.s, vTexCoord.t));
-        gl_FragColor = icon2D * vec4(1.0, 1.0, 1.0, 1.0);
-      }
-    </script>
     <script src="triangle.jsx.js"></script>
-  </head>
- nya-ahogehoge
   <body style="background-color: gray">
-    <!--<input type="file" accept="image/*;capture=camera">-->
-    <!--<video id="hogl" width="200" height="200" autoplay=true></video>-->
-    <!--<canvas id="canvas" width="640" height="480"></canvas>-->
-    <!--<device type="media" onchange="update(this.data)"></device>-->
-    <!--<device type=media onchange="update(this.data)"></device>-->
+   <video id="v" width="256" height="192" autoplay="ture" controls="true"></video>video
     <div>
     </div>
     <img src="./icon.jpg" alt="" id="img"/>
     <canvas id="world" width="400" height="400" style="background-color: gray"/>
-    <script src="video.js"></script>
   </body>
 </html>
 

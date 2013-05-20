@@ -8,41 +8,30 @@
       uniform vec3 position;
       uniform vec3 scale;
       uniform mat4 projectionMatrix;
-      uniform vec3 backImagePosition;
-
       varying vec2 vTexCoord;
-      varying vec3 vPosition;
-      varying vec3 vBackPosition;
       void main() {
         //gl_Position = vec4(vertex.x + position.x, vertex.y + position.y, vertex.z, 1.0);
         gl_Position = projectionMatrix * vec4(vertex * scale + position, 1.0);
         vTexCoord = vTextureCoord;
-        vPosition = position;
-        //vBackPosition = vTextureCoord;
-        vBackPosition = backImagePosition;
       }
     </script>
     <script type="x-shader/x-fragment" id="f-shader">
       precision mediump float;
-      uniform vec4 color;
       varying vec2 vTexCoord;
-      varying vec3 vPosition;
-      varying vec3 vBackPosition;
-      uniform sampler2D snowTex;
+      uniform sampler2D tex;
+      uniform float alpha;
       float gray_color;
       void main() {
-        vec4 snow2D = texture2D(snowTex, vec2(vTexCoord.s, vTexCoord.t));
         //vec3 depth = vec3(1.0, 1.0, 1.0) + vPosition.z / 150.0;
-        gl_FragColor = snow2D * vec4(1.0, 1.0, 1.0, 0.6);
+        //gl_FragColor = texture2D(tex, vec2(vTexCoord.s, vTexCoord.t)) * vec4(1.0, 1.0, 1.0, 0.6);
+        gl_FragColor = texture2D(tex, vec2(vTexCoord.s, vTexCoord.t)) * vec4(1.0, 1.0, 1.0, alpha);
       }
     </script>
     <script src="triangle.jsx.js"></script>
   <body style="background-color: gray">
-   <video id="v" width="256" height="192" autoplay="ture" controls="true"></video>video
-    <div>
-    </div>
-    <img src="./icon.jpg" alt="" id="img"/>
-    <canvas id="world" width="400" height="400" style="background-color: gray"/>
+   <video id="v" autoplay="ture" controls="true" style="display:none"></video>
+   <canvas id="world" width="700" height="700" style="background-color: gray"/>
+    <!--<canvas id="world" width="400" height="400" style="background-color: gray"/>-->
   </body>
 </html>
 

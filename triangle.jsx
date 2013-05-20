@@ -31,9 +31,6 @@ class _Main {
     gl.linkProgram(prog);
     gl.useProgram(prog);
 
-    var snowTexUniform = gl.getUniformLocation(prog, 'snowTex');
-    gl.uniform1i(snowTexUniform, 0);
-
     //var projectionMatrix = M44.frustum(-1, 1, -1, 1, 7, 1000);
     var projectionMatrix = M44.frustum(-0.8, 0.8, -0.8, 0.8, 7, 1000);
     var projectionMatrix_location = gl.getUniformLocation(prog, 'projectionMatrix');
@@ -45,10 +42,10 @@ class _Main {
 
     // データを中に入れる bufferの中に入れる
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
-          1.0,   1.0,  0.0,
-          0.0,   1.0,  0.0,
-          1.0,   0.0,  0.0,
-          0.0,   0.0,  0.0
+           1.0,   1.0,  0.0,
+          -1.0,   1.0,  0.0,
+           1.0,  -1.0,  0.0,
+          -1.0,  -1.0,  0.0
           ]), gl.STATIC_DRAW);
 
     var vertex_loc = gl.getAttribLocation(prog, 'vertex');
@@ -89,6 +86,8 @@ class _Main {
     var color = gl.getUniformLocation(prog, 'color');
     gl.uniform4fv(color, new Float32Array([1.0, 1.0, 1.0, 0.1]));
 
+    var alphaLoc = gl.getUniformLocation(prog, 'alpha');
+
     var scale = 1.0;
     var scale_loc = gl.getUniformLocation(prog, 'scale');
 
@@ -110,10 +109,11 @@ class _Main {
 
     var weight = [0.1, 0.2];
     var origPosition = [[0.5, 0.5, 0.5]];
-    for (var i = 0; i < 1000; i++) {
+    for (var i = 0; i < 3000; i++) {
       weight.push(1.0 - Math.random() * 2);
       origPosition.push(
-          [1 - Math.random() * 2, 3 - Math.random() * 2, -4 - Math.random() * 5]
+          [1 - Math.random() * 2, 4 - Math.random() * 3, -4 - Math.random() * 5]
+          //[1 - Math.random() * 2, 4 - Math.random() * 3, -1 + Math.random() * 2]
           );
     }
 
@@ -153,8 +153,6 @@ class _Main {
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
 
-    scale = 0.2;
-    gl.uniform3fv(scale_loc, new Float32Array([scale, scale, scale]));
     var positions = origPosition;
     function update() : void {
       Timer.setTimeout(update, 1000 / UPDATE_FPS);
@@ -167,6 +165,8 @@ class _Main {
       }
     }
 
+    //scale = 0.03;
+    //gl.uniform3fv(scale_loc, new Float32Array([scale, scale, scale]));
     var position = gl.getUniformLocation(prog, 'position');
     function render(f:number) : void {
       Timer.requestAnimationFrame(render);
@@ -178,29 +178,45 @@ class _Main {
       gl.bindTexture(gl.TEXTURE_2D, texture2);
       gl.uniform3f(position, -20, -20, -900);
       gl.uniform3fv(scale_loc, new Float32Array([100, 100, 100]));
+      gl.uniform1f(alphaLoc, 1.0);
       gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 
 
       gl.bindTexture(gl.TEXTURE_2D, cameraTex);
       //if (video.videoWidth >= 16 && video.videoHeight >= 16) {
         function pot_ge(n:number):number{var r=1; while(r<n)r*=2; return r;}
-        var texSizeX = pot_ge(video.videoWidth);
-        var texSizeY = pot_ge(video.videoHeight);
+        //var texSizeX = pot_ge(video.videoWidth);
+        //var texSizeY = pot_ge(video.videoHeight);
+        //次にココの調整する！
+        var texSizeX = pot_ge(1024);
+        var texSizeY = pot_ge(1024);
+        //var texSizeX = pot_ge(100);
+        //var texSizeY = pot_ge(100);
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, texSizeX, texSizeY, 0, gl.RGB, gl.UNSIGNED_BYTE, null);
         gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, gl.RGB, gl.UNSIGNED_BYTE, video);
         gl.generateMipmap(gl.TEXTURE_2D);
-        var texCoordScaleX = video.videoWidth / texSizeX;
-        var texCoordScaleY = video.videoHeight / texSizeY;
+        //var texCoordScaleX = video.videoWidth / texSizeX;
+        //var texCoordScaleY = video.videoHeight / texSizeY;
         //gl.uniform2f(gl.getUniformLocation(prog, 'texCoordScale'), texCoordScaleX, texCoordScaleY);
       //}
-      gl.uniform3f(position, -40, -40, -500);
+      //gl.uniform3f(position, -20, -18, -150);
+      //gl.uniform3f(position, -25, -23, -200);
+      gl.uniform3f(position, 25, 53, -400);
+      
       gl.uniform3fv(scale_loc, new Float32Array([100, 100, 100]));
+      gl.uniform1f(alphaLoc, 1.0);
       gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 
-      gl.uniform3fv(scale_loc, new Float32Array([scale, scale, scale]));
       gl.bindTexture(gl.TEXTURE_2D, texture);
       for (var i = 0; i < positions.length; i++) {
-        gl.uniform3f(position, positions[i][0] / scale, positions[i][1] / scale, positions[i][2] / scale);
+        //gl.uniform3f(position, positions[i][0] / scale, positions[i][1] / scale, positions[i][2] / scale);
+        gl.uniform3f(position, positions[i][0] * scale, positions[i][1] * scale, positions[i][2] * scale);
+        gl.uniform3f(position, positions[i][0], positions[i][1], positions[i][2]);
+        gl.uniform1f(alphaLoc, 0.3);
+        // 座標系を-1から1にしたからpositionの調整いりそう
+        scale = 0.03;
+        //scale = positions[i][2] / 200 + 0.01;
+        gl.uniform3fv(scale_loc, new Float32Array([scale, scale, scale]));
         gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
       }
     }
@@ -211,12 +227,7 @@ class _Main {
     update();
     render(0);
 
-    //var videoTexUniform = gl.getUniformLocation(prog, 'videoTex');
     var vertexPosAttrib = gl.getAttribLocation(prog, 'aVertexPosition');
-    //var textureCoordAttribute = gl.getAttribLocation(prog, 'vTextureCoord');
-    //var videoElement = dom.id("video") as HTMLVideoElement;
-    //var videoElement = dom.createElement("video") as HTMLVideoElement;
-
     gl.vertexAttribPointer(vertexPosAttrib, 4, gl.FLOAT, false, 0, 0);
 
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureCoordinates), gl.STATIC_DRAW);

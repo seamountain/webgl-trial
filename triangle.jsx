@@ -110,7 +110,7 @@ class _Main {
     var weight = [0.1, 0.2];
     var origPosition = [[0.5, 0.5, 0.5]];
     for (var i = 0; i < 3000; i++) {
-      weight.push(1.0 - Math.random() * 2);
+      weight.push(0.5 - Math.random() * 2);
       origPosition.push(
           [1 - Math.random() * 2, 4 - Math.random() * 3, -4 - Math.random() * 5]
           //[1 - Math.random() * 2, 4 - Math.random() * 3, -1 + Math.random() * 2]
@@ -127,7 +127,8 @@ class _Main {
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
     });
-    img.src = 'icon.gif';
+    //img.src = 'icon.gif';
+    img.src = 'snow.png';
 
     var texture2 = gl.createTexture();
     var img2 = dom.createElement("img") as HTMLImageElement;
@@ -160,7 +161,7 @@ class _Main {
         if (positions[i][1] < -1) {
           positions[i][1] = origPosition[i][1];
         } else {
-          positions[i][1] -= 0.01 + weight[i]/100;
+          positions[i][1] -= 0.01 + weight[i] / 100;
         }
       }
     }
@@ -188,8 +189,8 @@ class _Main {
         //var texSizeX = pot_ge(video.videoWidth);
         //var texSizeY = pot_ge(video.videoHeight);
         //次にココの調整する！
-        var texSizeX = pot_ge(1024);
-        var texSizeY = pot_ge(1024);
+        var texSizeX = pot_ge(1000);
+        var texSizeY = pot_ge(1000);
         //var texSizeX = pot_ge(100);
         //var texSizeY = pot_ge(100);
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, texSizeX, texSizeY, 0, gl.RGB, gl.UNSIGNED_BYTE, null);
@@ -207,6 +208,8 @@ class _Main {
       gl.uniform1f(alphaLoc, 1.0);
       gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 
+      scale = 0.02;
+      gl.uniform3fv(scale_loc, new Float32Array([scale, scale, scale]));
       gl.bindTexture(gl.TEXTURE_2D, texture);
       for (var i = 0; i < positions.length; i++) {
         //gl.uniform3f(position, positions[i][0] / scale, positions[i][1] / scale, positions[i][2] / scale);
@@ -214,9 +217,9 @@ class _Main {
         gl.uniform3f(position, positions[i][0], positions[i][1], positions[i][2]);
         gl.uniform1f(alphaLoc, 0.3);
         // 座標系を-1から1にしたからpositionの調整いりそう
-        scale = 0.03;
+        //scale = 0.03;
         //scale = positions[i][2] / 200 + 0.01;
-        gl.uniform3fv(scale_loc, new Float32Array([scale, scale, scale]));
+        //gl.uniform3fv(scale_loc, new Float32Array([scale, scale, scale]));
         gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
       }
     }

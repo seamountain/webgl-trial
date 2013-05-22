@@ -10,7 +10,6 @@
       uniform mat4 projectionMatrix;
       varying vec2 vTexCoord;
       void main() {
-        //gl_Position = vec4(vertex.x + position.x, vertex.y + position.y, vertex.z, 1.0);
         gl_Position = projectionMatrix * vec4(vertex * scale + position, 1.0);
         vTexCoord = vTextureCoord;
       }
@@ -22,8 +21,6 @@
       uniform float alpha;
       float gray_color;
       void main() {
-        //vec3 depth = vec3(1.0, 1.0, 1.0) + vPosition.z / 150.0;
-        //gl_FragColor = texture2D(tex, vec2(vTexCoord.s, vTexCoord.t)) * vec4(1.0, 1.0, 1.0, 0.6);
         gl_FragColor = texture2D(tex, vec2(vTexCoord.s, vTexCoord.t)) * vec4(1.0, 1.0, 1.0, alpha);
       }
     </script>
@@ -31,7 +28,6 @@
   <body style="background-color: gray">
    <video id="v" autoplay="ture" controls="true" style="display:none"></video>
    <canvas id="world" width="700" height="700" style="background-color: gray"/>
-    <!--<canvas id="world" width="400" height="400" style="background-color: gray"/>-->
   </body>
 </html>
 
